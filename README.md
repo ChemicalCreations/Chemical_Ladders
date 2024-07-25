@@ -7,5 +7,5 @@
 
  For more cool free mods:
   Visit https://ko-fi.com/chemicalcreations
-  Shear your thoughts https://discord.com/invite/FxHCc7j or HMU
+  Share your thoughts https://discord.com/invite/FxHCc7j or HMU
   Help the code https://github.com/ChemicalCreations/Chemical_Ladders
