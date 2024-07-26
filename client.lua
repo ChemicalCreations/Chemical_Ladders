@@ -379,7 +379,7 @@ addEventHandler("onClientPreRender", root, function(tick)
 				end
 				if (isSyncer or data.isLocal) and data.dir == nil and data.dir_next == nil and p < 100 then
 					local dir = 0 + getPedAnalogControlState(ped, "forwards") +
-					-getPedAnalogControlState(ped, "backwards")
+						-getPedAnalogControlState(ped, "backwards")
 					if dir == 0 then
 						prog = 0
 					else
@@ -402,8 +402,8 @@ addEventHandler("onClientPreRender", root, function(tick)
 							local anim = anim[data.next]
 							if anim.edge_dist then
 								p, move =
-								(size - anim.edge_dist - (getValueAtTime(state.anim_end, state.climb_move) - move_s)) /
-								size, 0
+									(size - anim.edge_dist - (getValueAtTime(state.anim_end, state.climb_move) - move_s)) /
+									size, 0
 							end
 						else
 							data.next = state.climb_next or false
@@ -435,8 +435,10 @@ addEventHandler("onClientPreRender", root, function(tick)
 					data.next = nil
 					data.prog = dir < 0 and state.anim_end or state.anim_start
 					if state.anim_hold then data.dir = nil end
-					if isSyncer then triggerServerEvent("onPlayerReportLadderClimbingState", ped, data.surface,
-							data.climb, p, data.state, data.prog, data.dir, data.dir_next) end
+					if isSyncer then
+						triggerServerEvent("onPlayerReportLadderClimbingState", ped, data.surface,
+							data.climb, p, data.state, data.prog, data.dir, data.dir_next)
+					end
 				else
 					remover[#remover + 1] = ped
 					--if isSyncer then triggerServerEvent("onPlayerReportLadderClimbingState", ped, false) end
