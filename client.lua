@@ -8,8 +8,7 @@ local climbs = {}
 
 local anim = anims
 
-
-
+local DEBUG_SHOW_LADDER_BLIPS = true
 
 addEvent("onClientPedLadderClimbingStart")
 addEvent("onClientPedLadderClimbingStop")
@@ -544,6 +543,16 @@ addEventHandler("onClientRecieveLadderClimbingReady", localPlayer, function(a, b
 	end
 	ready = true
 	climbs, climbers = a, b
+
+	if DEBUG_SHOW_LADDER_BLIPS then
+		for surface, surfaceData in pairs(climbs) do
+			for climb, l in pairs(surfaceData) do
+				local sx, sy, sz = l.sx, l.sy, l.sz
+				createBlip(sx, sy, sz, 0, 2, 255, 0, 0, 255, 0, 99999.0)
+			end
+		end
+	end
+
 	addEventHandler("onClientRecievePedLadderClimbingState", root, function(info, forced)
 		local ped = source
 		if ped == localPlayer and not forced then return end
