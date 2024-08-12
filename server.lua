@@ -22,7 +22,7 @@ function setPedClimbingLadder(ped, surface, ladder, pos)
         local event = climbers[ped]
         climbers[ped] = nil
         triggerClientEvent("onClientRecievePedLadderClimbingState", ped, climbers[ped], true)
-        if event then triggerEvent("onLadderClimbingStop", root, surface, ladder, ped) end
+        if event then triggerEvent("onLadderClimbingStop", isElement(surface) and surface or root, surface, ladder, ped) end
         if event then triggerEvent("onPedLadderClimbingStop", ped, surface, ladder, event.position) end
         return true
     end
@@ -44,7 +44,7 @@ function setPedClimbingLadder(ped, surface, ladder, pos)
             local event = not climbers[ped]
             climbers[ped] = data
             triggerClientEvent("onClientRecievePedLadderClimbingState", ped, climbers[ped], true)
-            if event then triggerEvent("onLadderClimbingStart", root, surface, ladder, ped, data.state) end
+            if event then triggerEvent("onLadderClimbingStart", isElement(surface) and surface or root, surface, ladder, ped, data.state) end
             if event then triggerEvent("onPedLadderClimbingStart", ped, surface, ladder, data.state) end
             return true
         end
@@ -270,7 +270,7 @@ addEventHandler("onPlayerReportLadderClimbingState", root, function(climbSurface
             climbers[ped] = nil
             data = nil
         end
-        if event then triggerEvent("onLadderClimbingStop", root, climbSurface, ladder, ped) end
+        if event then triggerEvent("onLadderClimbingStop", isElement(climbSurface) and climbSurface or root, climbSurface, ladder, ped) end
         if event then triggerEvent("onPedLadderClimbingStop", ped, climbSurface, ladder, position) end
         return triggerClientEvent("onClientRecievePedLadderClimbingState", ped, data or nil)
     end
@@ -301,7 +301,7 @@ addEventHandler("onPlayerReportLadderClimbingState", root, function(climbSurface
     data.final_angle = angle
     data.prog = time
     data.position = position
-    if event then triggerEvent("onLadderClimbingStart", root, climbSurface, ladder, ped, step) end
+    if event then triggerEvent("onLadderClimbingStart", isElement(climbSurface) and climbSurface or root, climbSurface, ladder, ped, step) end
     if event then triggerEvent("onPedLadderClimbingStart", ped, climbSurface, ladder, step) end
     triggerClientEvent("onClientRecievePedLadderClimbingState", ped, data or nil)
 end)
@@ -322,7 +322,7 @@ end)
 do
     local elements = {}
     function updateElementModes(element, model)
-        local info = ladderModels[model] or ladderModels[getVehicleNameFromModel(model)]
+        local info = model and (ladderModels[model] or ladderModels[getVehicleNameFromModel(model)])
         local data = climbs[element]
         --iprint(element, model, info and true, data and true, climbs[element])
         if data then
@@ -357,12 +357,12 @@ addEventHandler("onResourceStart", resourceRoot, function() -- onVehicleCreate
 			local vehicles = getElementsByType("vehicle", root)
 			element = vehicles[#vehicles]
 		end
-		if elements[element]==nil then
+		if element and elements[element]==nil then
 			elements[element] = "vehicle"
             watcher(element)
 		else
 			for i, element in pairs(getElementsByType("vehicle", root)) do
-				if elements[element]==nil then
+				if element and elements[element]==nil then
 					elements[element] = "vehicle"
                     watcher(element)
 					break
@@ -377,18 +377,21 @@ addEventHandler("onResourceStart", resourceRoot, function() -- onVehicleCreate
 	end
 	addDebugHook("postFunction", function(sourceResource, functionName, isAllowedByACL, luaFilename, luaLineNumber, ...)
 		index.object = index.object+1 
-		local element = getElementByIndex("object", index.object, sourceResource)
+		local element = getElementByIndex("object", index.object)
+        iprint("zero", element)
 		if elements[element] then
 			local vehicles = getElementsByType("object", root)
 			element = vehicles[#vehicles]
 		end
-		if elements[element]==nil then
+		if element and elements[element]==nil then
 			elements[element] = "object"
+            iprint("ONE", element)
             watcher(element)
 		else
 			for i, element in pairs(getElementsByType("object", root)) do
-				if elements[element]==nil then
+				if element and elements[element]==nil then
 					elements[element] = "object"
+                    iprint("TWO", element)
                     watcher(element)
 					break
 				end
@@ -401,12 +404,14 @@ addEventHandler("onResourceStart", resourceRoot, function() -- onVehicleCreate
         watcher(element)
 	end
 	addDebugHook("postEvent", function(sourceResource, eventName, eventSource, eventClient, luaFilename, luaLineNumber, ...)
+        iprint("DDS", eventSource, elements[eventSource])
 		if elements[eventSource] then
             local eType = elements[eventSource]
 			elements[eventSource] = nil
 			index[eType] = index[eType]-1
+            updateElementModes(eventSource, nil)
 		return end
-	end, {"onElementDestroy"})
+	end, {"onElementDestroy", Destroy})
 end, false)
 
 

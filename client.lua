@@ -602,6 +602,15 @@ function processLadders(tick)
 			local p = data.position
 			local sx, sy, sz, tx, ty, tz, rx, ry, rz, d = getLadderPositionFromData(data.surface, data.climb, l)
 			local dx, dy, dz = tx-sx, ty-sy, tz-sz
+			local dist_down, dist_up
+			do
+				data.position = p
+				local x, y, z = sx+dx*p, sy+dy*p, sz+dz*p
+				local hit, hx, hy, hz = processLineOfSight(x, y, z, sx, sy, sz, true, true, false, true, true, true, false, true, isElement(data.surface) and data.surface or false)
+				dist_down = l.dynamic and hx and getDistanceBetweenPoints3D(x, y, z, hx, hy, hz)-1.05 or getDistanceBetweenPoints3D(x, y, z, sx, sy, sz)
+				local hit, hx, hy, hz = processLineOfSight(x, y, z, tx, ty, tz, true, true, false, true, true, true, false, true, isElement(data.surface) and data.surface or false)
+				dist_up = l.dynamic and hx and getDistanceBetweenPoints3D(x, y, z, hx, hy, hz) or getDistanceBetweenPoints3D(x, y, z, tx, ty, tz)
+			end
 			local size = ((dx)^2+(dy)^2+(dz)^2)^.5
 			local state = anim[data.state]
 			local move = 0
@@ -666,14 +675,14 @@ function processLadders(tick)
 								data.next = state.climb_next or false
 							end
 						elseif data.dir<0 then
-							if d<(state.down_turn or 0.91) then
+							if dist_down<(state.down_turn or 0.91) then
 								if l.water then
 									data.next = "fall2"
 								else 
 									data.next = state.climb_down or false
 									local anim = anim[data.next]
 									if anim.edge_dist then
-										p, move = (anim.edge_dist)/size, 0
+										p, move = p+(anim.edge_dist-dist_down)/size, 0
 									end
 								end
 							else

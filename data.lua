@@ -1,23 +1,117 @@
 testing = false
 
-ladderProperties = {sx=0 , sy=0, sz=0, tx=0, ty=0, tz=0, rx=0, ry=0, rz=0, d=0, shift_exit=0, water=false, sliding=true, inside=false, jumping=true}
+
+
+--[[ [Help]
+	-- Table Layouts --
+
+	---- Table: climbs ----
+	["SurfaceID"/ladderElement] = { -- Note: If surfaceID is an element, all positions are relative
+		[ladderIndex] = { -- individual ladders of a surface
+			sx=0 , sy=0, sz=0, -- ladder start position
+			tx=0, ty=0, tz=0, -- ladder end position
+			rx=0, ry=0, rz=0, -- ladder rotation
+			d=1, -- distance from ladder it can be grabbed (not players grab point has a 0.3 offset)
+			shift_exit = 0, -- distance to warp player upon ladder exit (Y axis relative to ladder) (doesn't affect all exits)
+			water = false, -- will fall on ladder exit (change exit anim)
+			sliding = true, -- allows sliding down ladders by hold "crouch" key
+			inside = false, -- allows entering ladders' the "sprint" key (for ladders with platforms) (also allows entering from rear of ladder)
+			jumping = true, -- allows jumping off ladders with the "jump" key
+			dynamic = false, -- detects ground level to exit ladder
+		}
+	}
+
+
+	---- Table: ladderModels ----
+		Note: This table will automatically assign a ladder surface to all vehicles/objects created as the index models
+	[ModelNumber/ModelName] -- { -- Note: Model Name is untested and would likely only support vehicle names atm
+		[ladderIndex] = {ladderData} -- (See ladder data under "Table Layouts > climbs")
+	}
+
+
+	---- Table: anims ----
+	["ladderAnim"] = {
+		block = "dozer", -- animation block
+		anim = "DOZER_Align_LHS", -- animation name
+		anim_start = 350, -- anim start position
+		anim_hold = 530, -- anim wait for player input position
+		anim_end = 720, -- anim end position
+		anim_fade = 120, -- ms to blend into next anim
+		speed = 1, -- task speed multiplier
+		anim_duration = 930, -- ms lenght of anim
+		align = 130, -- max ms to align to ladder 
+		blend = 150, -- ms to blend into anim (for when starting to use a ladder)
+		climb_up = "exit_l", -- next anim for going up (often to exit)
+		climb_next = "climb_r", -- next animation to move along lader
+		climb_down = "enter_l", -- next anim for going down (often to exit)
+		climb_move = {{0, 250}, {0.04, 300}, {0.424, 430}, {0.494, 530}, {1.093, 720}}, -- used to move ped up/down ladder per time
+		climb_angle = {{-90, 0}, {0, 170}}, -- used to apply rotation per time
+		climb_adjust = {{0.0, 000, 300}, {0.243, 400}, {0.700, 800}}, -- used to move ped in/out per time (Y pos axis)
+		climb_roll = {{0, 300}, {-22, 500}}, -- used to apply "X" rot axis tilt per time
+		velocity = {x=0.0, y=0.0, z=0.0}, -- used to apply velocity to ped over time (replaces "climb_move" value with velocity)
+		straight = true, -- used to disable some ped rotation adjustment (mainly in case of "X" axis leaning)
+	},
+]]
+
+--[[	[Help]
+	
+	---- Server Events ----
+		"onLadderAdd" ++ root/surfaceElement (surface, ladder) -- when a new ladder is added (may be bypassed by onElementModelChange)
+		"onLadderRemove" ++ root/surfaceElement (surface[, ladder]) -- when a new ladder is removed (may be bypassed by onElementModelChange)
+		"onLadderClimbingStart" ++ root/surfaceElement (surface, ladder, ped, step) -- when a ladder is enterd by a ped
+		"onLadderClimbingStop" ++ root/surfaceElement (surface, ladder, ped) -- when a ladder is exited by a ped
+		"onPedLadderClimbingStart" ++ ped (surface, ladder, step) -- when a ped starts using a ladder
+		"onPedLadderClimbingStop" ++ ped (surface, ladder, position) -- when a ped stops using a ladder
+		"onPedLadderClimbingStep" ++ ped (surface, ladder) -- when a ped changes ladder step animation
+		NOTE: Ladders are built for player elements and peds may not work or give unexpected results
+  
+	---- Server Functions ----
+		setPedClimbingLadder(ped, surface, ladder, pos) - server
+		isPedClimbingLadder(ped) - shared
+		getPedsOnLadder(surface) - shared
+		setPedLadderClimbingEnabled(ped, enabled) - server
+		isPedLadderClimbingEnabled(ped) - shared
+		getLadderClosestToPosition(px, py, pz) - shared
+		getLadders(surface) - shared
+		setLadderEnabled(surface, ladder, active) - server
+		setLadderProperties(surface, ladder, properties) - server
+		getLadderProperties(surface, ladder) - shared
+		addLadder(surface, sx, sy, sz, tx, ty, tz, rx, ry, rz, d, jumping, inside, sliding, water, exitShift) - server
+		removeLadder(surface, ladder) - server
+  
+	---- Client Events ----
+		"onClientPedLadderClimbingStart" ++ ped (step) -- when a ped starts using a ladder
+		"onClientPedLadderClimbingStop" ++ ped () -- when a ped stops using a ladder
+		"onClientPedLadderClimbingStep" ++ ped (step) -- when a ped changes ladder step animation
+
+	---- Client Functions ----
+		isPedClimbingLadder(ped) - shared
+		getPedsOnLadder(surface) - shared
+		isPedLadderClimbingEnabled(ped) - shared
+		getLadderClosestToPosition(px, py, pz) - shared
+		getLadders(surface) - shared
+		getLadderProperties(surface, ladder) - shared
+]]
+
+
+ladderProperties = {sx=0 , sy=0, sz=0, tx=0, ty=0, tz=0, rx=0, ry=0, rz=0, d=0, shift_exit=0, water=false, sliding=true, inside=false, jumping=true, dynamic=false}
 
 ladderModels = {
 	[590] = {
-		{sx=2.1 , sy=8.25, sz=-1.2, tx=2.1, ty=8.25, tz=3.2, rx=0, ry=0, rz=90, d=1},
-		{sx=-2.1 , sy=8.25, sz=-1.2, tx=-2.1, ty=8.25, tz=3.2, rx=0, ry=0, rz=-90, d=1},
-		{sx=2.1 , sy=-8.25, sz=-1.2, tx=2.1, ty=-8.25, tz=3.2, rx=0, ry=0, rz=90, d=1},
-		{sx=-2.1 , sy=-8.25, sz=-1.2, tx=-2.1, ty=-8.25, tz=3.2, rx=0, ry=0, rz=-90, d=1},
+		{sx=2.1 , sy=8.25, sz=-1.2, tx=2.1, ty=8.25, tz=3.2, rx=0, ry=0, rz=90, d=1, dynamic=true},
+		{sx=-2.1 , sy=8.25, sz=-1.2, tx=-2.1, ty=8.25, tz=3.2, rx=0, ry=0, rz=-90, d=1, dynamic=true},
+		{sx=2.1 , sy=-8.25, sz=-1.2, tx=2.1, ty=-8.25, tz=3.2, rx=0, ry=0, rz=90, d=1, dynamic=true},
+		{sx=-2.1 , sy=-8.25, sz=-1.2, tx=-2.1, ty=-8.25, tz=3.2, rx=0, ry=0, rz=-90, d=1, dynamic=true},
 	},
 	[1428] = {
-		{sx=0 , sy=-0.7, sz=-0.55, tx=0, ty=0.2, tz=2.6, rx=0, ry=0, rz=0, d=1},
+		{sx=0 , sy=-0.7, sz=-0.55, tx=0, ty=0.2, tz=2.6, rx=0, ry=0, rz=0, d=1, dynamic=true},
 	},
 	[1437] = {
-		{sx=0 , sy=-0.7, sz=-0.4, tx=0, ty=0.8, tz=6.2, rx=0, ry=0, rz=0, d=1},
+		{sx=0 , sy=-0.7, sz=-0.4, tx=0, ty=0.8, tz=6.2, rx=0, ry=0, rz=0, d=1, dynamic=true},
 	},
 }
 
-climbs = { -- ladder ID (or map/object element as a future )
+climbs = { -- ladder ID (or vehicle/object element )
     ["airport_sf"] = {
         {sx=-1736.60, sy=-445.96, sz=1.96, tx=-1736.60, ty=-445.96, tz=14.10, rx=0, ry=0, rz=-90, d=1},
         {sx=-1618.83, sy=-83.9, sz=1.96, tx=-1618.74, ty=-84.0, tz=14.10, rx=0, ry=0, rz=-135, d=1},
@@ -46,8 +140,8 @@ climbs = { -- ladder ID (or map/object element as a future )
         {sx=-1063.20, sy=-640.44, sz=34.09, tx=-1063.20, ty=-640.44, tz=44.20, rx=0, ry=0, rz=0, d=1.1},
 		{sx=-1097.464 , sy=-640.731, sz=34.089, tx=-1097.464, ty=-640.731, tz=44.20, rx=0, ry=0, rz=0, d=1.1},
         {sx=-1062.69, sy=-671.95, sz=32.50, tx=-1062.69, ty=-671.95, tz=56.33, rx=0, ry=0, rz=180, d=1.5, shift_exit=-1.5, jumping=false},
-		{sx=-1008.30 , sy=-704.145, sz=32.00, tx=-1008.30, ty=-704.145, tz=94.60, rx=0, ry=0, rz=270, d=1.1, shift_exit=-1.0, water=nil, sliding=nil, inside=true, jumping=false, enabled=nil}, -- shit col
-		{sx=-1059.062 , sy=-603.542, sz=34.09, tx=-1059.062, ty=-603.542, tz=92.92, rx=0, ry=0, rz=270, d=10, shift_exit=-1, water=nil, sliding=nil, inside=true, jumping=false, enabled=nil}, -- shit col
+		{sx=-1008.30 , sy=-704.145, sz=32.00, tx=-1008.30, ty=-704.145, tz=94.60, rx=0, ry=0, rz=270, d=1.1, shift_exit=-1.0, water=nil, sliding=nil, inside=true, jumping=false, dynamic=false}, -- shit col
+		{sx=-1059.062 , sy=-603.542, sz=34.09, tx=-1059.062, ty=-603.542, tz=92.92, rx=0, ry=0, rz=270, d=10, shift_exit=-1, water=nil, sliding=nil, inside=true, jumping=false, dynamic=false, -- shit col
 	},
 	["factory_lv"] = {--Factory 2
 		{sx=2688.041 , sy=2637.703, sz=10.82, tx=2688.041, ty=2637.703, tz=34.82, rx=0, ry=0, rz=0, d=1},
@@ -94,7 +188,6 @@ anims = {
 		speed = 0.8, -- task speed multiplier
 		anim_duration = 930, -- ms lenght of anim
 		align = 130, -- max ms to align to ladder 
-		align_angle = 90, -- max align angle (modt time)
 		blend = 100, -- ms to blend into anim
 		edge_dist = 0.42, -- gta units from edge, anim starts
 		climb_up = "climb_l",
@@ -110,11 +203,9 @@ anims = {
 		anim_hold = 530, -- anim wait for player input position
 		anim_end = 720, -- anim end position
 		anim_fade = 120, -- ms to blend  into next anim
-		exit_anim = 630,
 		speed = 1, -- task speed multiplier
 		anim_duration = 930, -- ms lenght of anim
 		align = 130, -- max ms to align to ladder 
-		align_angle = -90, -- max align angle (modt time)
 		blend = 150, -- ms to blend into anim
 		climb_up = "exit_l",
 		climb_next = "climb_r",
@@ -131,7 +222,6 @@ anims = {
 		speed = 1, -- task speed multiplier
 		anim_duration = 970, -- ms lenght of anim
 		align = 130, -- max ms to align to ladder 
-		align_angle = 90, -- max align angle (modt time)
 		blend = 150, -- ms to blend into anim
 		climb_up = "exit_r",
 		climb_next = "climb_l",
@@ -148,7 +238,6 @@ anims = {
 		speed = 1, -- task speed multiplier
 		anim_duration = 870, -- ms lenght of anim
 		align = 130, -- max ms to align to ladder 
-		align_angle = 90, -- max align angle (modt time)
 		blend = 100, -- ms to blend into anim
 		edge_dist = 1.7,
 		climb_up = "exit",
@@ -166,7 +255,6 @@ anims = {
 		speed = 1, -- task speed multiplier
 		anim_duration = 870, -- ms lenght of anim
 		align = 130, -- max ms to align to ladder 
-		align_angle = 90, -- max align angle (modt time)
 		blend = 100, -- ms to blend into anim
 		edge_dist = 1.6, -- gta units from edge, anim starts
 		climb_up = "exit",
@@ -184,7 +272,6 @@ anims = {
 		speed = 1, -- task speed multiplier
 		anim_duration = 800, -- ms lenght of anim
 		align = 130, -- max ms to align to ladder 
-		align_angle = 90, -- max align angle (modt time)
 		blend = 100, -- ms to blend into anim
 		climb_up = "exit_f",
 		climb_down = "exit_r",
@@ -202,7 +289,6 @@ anims = {
 		speed = 1, -- task speed multiplier
 		anim_duration = 200, -- ms lenght of anim
 		align = 130, -- max ms to align to ladder 
-		align_angle = 90, -- max align angle (modt time)
 		blend = 50, -- ms to blend into anim
 		climb_up = nil,
 		climb_down = "exit",
@@ -320,10 +406,8 @@ anims = {
 		anim_hold = nil, -- anim wait for player input position
 		anim_end = 930, -- anim end position
 		anim_fade = 150, -- ms to blend  into next anim
-		exit_anim = 630,
 		speed = 0.9, -- task speed multiplier
 		anim_duration = 930, -- ms lenght of anim
-		align_angle = -90, -- max align angle (modt time)
 		blend = 100, -- ms to blend into anim
 		climb_up = "kick2",
 		climb_next = nil,
@@ -340,7 +424,6 @@ anims = {
 		speed = 0.7, -- task speed multiplier
 		anim_duration = 2500, -- ms lenght of anim
 		align = 130, -- max ms to align to ladder 
-		align_angle = 90, -- max align angle (modt time)
 		blend = 100, -- ms to blend into anim
 		climb_up = "kick3",
 		climb_next = nil,
@@ -373,10 +456,8 @@ anims = {
 		anim_hold = nil, -- anim wait for player input position
 		anim_end = 930, -- anim end position
 		anim_fade = 150, -- ms to blend  into next anim
-		exit_anim = 630,
 		speed = 0.9, -- task speed multiplier
 		anim_duration = 930, -- ms lenght of anim
-		align_angle = -90, -- max align angle (modt time)
 		blend = 100, -- ms to blend into anim
 		climb_up = "switch2",
 		climb_next = nil,
@@ -395,7 +476,6 @@ anims = {
 		speed = 0.7, -- task speed multiplier
 		anim_duration = 2500, -- ms lenght of anim
 		align = 130, -- max ms to align to ladder 
-		align_angle = 90, -- max align angle (modt time)
 		blend = 100, -- ms to blend into anim
 		climb_up = "switch3",
 		climb_next = nil,
@@ -430,11 +510,9 @@ anims = {
 		anim_hold = nil, -- anim wait for player input position
 		anim_end = 720, -- anim end position
 		anim_fade = 200, -- ms to blend  into next anim
-		exit_anim = 630,
 		speed = 1, -- task speed multiplier
 		anim_duration = 930, -- ms lenght of anim
 		align = 130, -- max ms to align to ladder 
-		align_angle = -90, -- max align angle (modt time)
 		blend = 100, -- ms to blend into anim
 		climb_up = nil,
 		climb_next = nil,
@@ -453,7 +531,6 @@ anims = {
 		speed = 1, -- task speed multiplier
 		anim_duration = 970, -- ms lenght of anim
 		align = 130, -- max ms to align to ladder 
-		align_angle = 90, -- max align angle (modt time)
 		blend = 100, -- ms to blend into anim
 		climb_up = nil,
 		climb_next = nil,
