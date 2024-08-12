@@ -606,8 +606,9 @@ function processLadders(tick)
 			do
 				data.position = p
 				local x, y, z = sx+dx*p, sy+dy*p, sz+dz*p
-				local hit, hx, hy, hz = processLineOfSight(x, y, z, sx, sy, sz, true, true, false, true, true, true, false, true, isElement(data.surface) and data.surface or false)
-				dist_down = l.dynamic and hx and getDistanceBetweenPoints3D(x, y, z, hx, hy, hz)-1.05 or getDistanceBetweenPoints3D(x, y, z, sx, sy, sz)
+				--dxDrawLine3D(x, y, z, sx, sy, sz, tocolor(255, 0, 0, 200), 1.2)
+				local hit, hx, hy, hz = processLineOfSight(x, y, z, sx-dx, sy-dy, sz-dz, true, true, false, true, true, true, false, true, isElement(data.surface) and data.surface or false)
+				dist_down = l.dynamic and hx and (getDistanceBetweenPoints3D(x, y, z, hx, hy, hz)-1.05) or getDistanceBetweenPoints3D(x, y, z, sx, sy, sz)
 				local hit, hx, hy, hz = processLineOfSight(x, y, z, tx, ty, tz, true, true, false, true, true, true, false, true, isElement(data.surface) and data.surface or false)
 				dist_up = l.dynamic and hx and getDistanceBetweenPoints3D(x, y, z, hx, hy, hz) or getDistanceBetweenPoints3D(x, y, z, tx, ty, tz)
 			end
@@ -796,8 +797,8 @@ function processLadders(tick)
 					if isElement(data.surface) then setElementCollidableWith(ped, data.surface, true) end
 				end
 				local v = state.velocity
-				setPedRotation(ped, rz+rot, true)
-				setElementRotation(ped, 0, 0, rz+rot, "ZXY")
+				setElementRotation(ped, 0, 0, 360-(rz+rot), "ZXY")
+				setPedRotation(ped, (rz+rot), true)
 				local x, y, z = getElementVelocity(ped)
 				local r = math.rad(rz+(data.final_angle or rot))
 				local d = -0.08
@@ -810,8 +811,8 @@ function processLadders(tick)
 				setElementPosition(ped, x, y, z, false)
 				data.x, data.y, data.z = getElementPosition(ped)
 				setElementVelocity(ped, 0, 0, 0)
-				setElementRotation(ped, 0, 0, rz+rot, "ZXY")
-				setPedRotation(ped, rz+rot, true)
+				setElementRotation(ped, 0, 0, 360-(rz+rot), "ZXY")
+				setPedRotation(ped, (rz+rot), true)
 			end
 			
 			--print("JJJJ", move, p, step, stepProg)
@@ -899,8 +900,9 @@ addEventHandler("onClientRecieveLadderClimbingReady", localPlayer, function(a, b
 					if data.jumping~=nil then l.jumping = data.jumping end
 					if data.inside~=nil then l.inside = data.inside end
 					if data.sliding~=nil then l.sliding = data.sliding end
+					if data.dynamic~=nil then l.dynamic = data.dynamic end
+					if data.shift_exit~=nil then l.shift_exit = data.shift_exit end
 					if data.d~=nil then l.d = data.d end
-					-- wtf.....  "enabled water jumping inside sliding d"???????
 				end
 			end
 		elseif climb==true then -- add/edit

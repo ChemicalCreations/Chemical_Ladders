@@ -378,20 +378,17 @@ addEventHandler("onResourceStart", resourceRoot, function() -- onVehicleCreate
 	addDebugHook("postFunction", function(sourceResource, functionName, isAllowedByACL, luaFilename, luaLineNumber, ...)
 		index.object = index.object+1 
 		local element = getElementByIndex("object", index.object)
-        iprint("zero", element)
 		if elements[element] then
 			local vehicles = getElementsByType("object", root)
 			element = vehicles[#vehicles]
 		end
 		if element and elements[element]==nil then
 			elements[element] = "object"
-            iprint("ONE", element)
             watcher(element)
 		else
 			for i, element in pairs(getElementsByType("object", root)) do
 				if element and elements[element]==nil then
 					elements[element] = "object"
-                    iprint("TWO", element)
                     watcher(element)
 					break
 				end
@@ -404,7 +401,7 @@ addEventHandler("onResourceStart", resourceRoot, function() -- onVehicleCreate
         watcher(element)
 	end
 	addDebugHook("postEvent", function(sourceResource, eventName, eventSource, eventClient, luaFilename, luaLineNumber, ...)
-        iprint("DDS", eventSource, elements[eventSource])
+        --iprint("DDS", eventSource, elements[eventSource])
 		if elements[eventSource] then
             local eType = elements[eventSource]
 			elements[eventSource] = nil

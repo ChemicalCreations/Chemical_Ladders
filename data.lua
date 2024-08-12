@@ -106,8 +106,8 @@ ladderModels = {
 	[1428] = {
 		{sx=0 , sy=-0.7, sz=-0.55, tx=0, ty=0.2, tz=2.6, rx=0, ry=0, rz=0, d=1, dynamic=true},
 	},
-	[1437] = {
-		{sx=0 , sy=-0.7, sz=-0.4, tx=0, ty=0.8, tz=6.2, rx=0, ry=0, rz=0, d=1, dynamic=true},
+	[1437] = { -- BIG LADDER
+		{sx=0 , sy=-0.8, sz=-0.4, tx=0, ty=0.7, tz=5.9, rx=0, ry=0, rz=0, d=1, dynamic=true},
 	},
 }
 
