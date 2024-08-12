@@ -141,7 +141,7 @@ climbs = { -- ladder ID (or vehicle/object element )
 		{sx=-1097.464 , sy=-640.731, sz=34.089, tx=-1097.464, ty=-640.731, tz=44.20, rx=0, ry=0, rz=0, d=1.1},
         {sx=-1062.69, sy=-671.95, sz=32.50, tx=-1062.69, ty=-671.95, tz=56.33, rx=0, ry=0, rz=180, d=1.5, shift_exit=-1.5, jumping=false},
 		{sx=-1008.30 , sy=-704.145, sz=32.00, tx=-1008.30, ty=-704.145, tz=94.60, rx=0, ry=0, rz=270, d=1.1, shift_exit=-1.0, water=nil, sliding=nil, inside=true, jumping=false, dynamic=false}, -- shit col
-		{sx=-1059.062 , sy=-603.542, sz=34.09, tx=-1059.062, ty=-603.542, tz=92.92, rx=0, ry=0, rz=270, d=10, shift_exit=-1, water=nil, sliding=nil, inside=true, jumping=false, dynamic=false, -- shit col
+		{sx=-1059.062 , sy=-603.542, sz=34.09, tx=-1059.062, ty=-603.542, tz=92.92, rx=0, ry=0, rz=270, d=10, shift_exit=-1, water=nil, sliding=nil, inside=true, jumping=false, dynamic=false}, -- shit col
 	},
 	["factory_lv"] = {--Factory 2
 		{sx=2688.041 , sy=2637.703, sz=10.82, tx=2688.041, ty=2637.703, tz=34.82, rx=0, ry=0, rz=0, d=1},
@@ -379,7 +379,7 @@ anims = {
 		climb_move = {{0, 1100}, {-0.2, 1200}},
 		climb_adjust = {{-0.3, 900}, {0, 1200}},
 		climb_angle = {{180, 0, 900}, {90, 1110}, {0, 1200}}, -- ped rot alignment angle
-		velocity = {x=0.5, y=0.5, z=1},
+		velocity = {x=0.6, y=0.6, z=1},
 	},
 	leap_fall = {
 		block = "ped",
