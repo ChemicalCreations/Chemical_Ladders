@@ -156,7 +156,7 @@ climbs = { -- ladder ID (or vehicle/object element )
 		{sx=2703.173 , sy=2676.83, sz=12.822, tx=2703.173, ty=2676.83, tz=22.92, rx=0, ry=0, rz=0, d=1},
 	},
 	["area_51"] = testing and {--test ladder
-		--{sx=268.8 , sy=1884.75, sz=-30.1, tx=268.8, ty=1884.75, tz=22.0, rx=0, ry=0, rz=0, d=1, water=nil, sliding=nil, inside=true, jumping=false, enabled=true, shift_exit=0},
+		{sx=268.8 , sy=1884.75, sz=-30.1, tx=268.8, ty=1884.75, tz=22.0, rx=0, ry=0, rz=0, d=1, water=nil, sliding=nil, inside=true, jumping=false, enabled=true, shift_exit=0},
     } or nil,
 }
 
