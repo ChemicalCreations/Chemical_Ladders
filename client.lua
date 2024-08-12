@@ -909,6 +909,15 @@ addEventHandler("onClientRecieveLadderClimbingReady", localPlayer, function(a, b
 			surfaceData[climb] = data
 		end
 	end)
+	if testing then
+		for surface, surfaceData in pairs(climbs) do
+			for climb, l in pairs(surfaceData) do
+				local sx, sy, sz = l.sx, l.sy, l.sz
+				createBlip(sx, sy, sz, 0, 2, 255, 0, 0, 255, 0, 99999.0)
+			end
+		end
+	end
+
 end)
 
 
