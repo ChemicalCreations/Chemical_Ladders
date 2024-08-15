@@ -1,8 +1,14 @@
 # Chemical_Ladders
  Make working ladders in MTA 
  Allows ladders to be climbed in Multi-Theft Auto
- Climb ladders using the vehicle enter/exit key (default: f/enter)
- Video - https://youtu.be/-XVog1RXpxI
+ Usage:
+  enter - enter or exit ladders
+  jump - jump of ladders (left/right changes directly)
+  crouch - slides down ladders
+  sprint - enter trough ladders with platforms 
+
+ Video v2 - https://youtu.be/K3JhbzGyQto
+ Video v1 - https://youtu.be/-XVog1RXpxI
  
 
  For more cool free mods:
